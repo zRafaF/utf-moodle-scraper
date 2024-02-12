@@ -1,7 +1,7 @@
 package backend
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -14,7 +14,7 @@ import (
 var API_KEY string
 
 func getApiKey() string {
-	log.Println("Loading API_KEY from .env file...")
+	slog.Info("Loading API_KEY from .env file...")
 	err := godotenv.Load()
 	if err != nil {
 		panic(err)
@@ -25,9 +25,7 @@ func getApiKey() string {
 		panic("API_KEY not found in .env file")
 	}
 
-	log.Println("API_KEY loaded successfully.")
-
-	log.Println("API_KEY:", envApiKey)
+	slog.Info("API_KEY loaded successfully.")
 
 	return envApiKey
 }
@@ -36,12 +34,23 @@ func init() {
 	API_KEY = getApiKey()
 }
 
-func Run() {
+// Run starts the backend service.
+func Run(debug bool) {
+	if !debug {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	var engine = gin.Default()
 
 	engine.GET("/ping", getPing)
-	engine.POST("/login-moodle", postLoginMoodle)
-	engine.Run(":8080")
+	engine.POST("/auth", postAuth)
+	engine.Run(":30412")
+
+	slog.Info("Service started on port 30412")
+}
+
+func getRoot(c *gin.Context) {
+	c.JSON(http.StatusOK, "Hello, world!")
+	slog.Info("Received request to root.")
 }
 
 func getPing(c *gin.Context) {
@@ -50,12 +59,19 @@ func getPing(c *gin.Context) {
 	})
 }
 
-func postLoginMoodle(c *gin.Context) {
+func postAuth(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	apiKey := c.PostForm("api_key")
 
-	log.Println("Received request with username:", username)
+	slog.Info("Received login request", "user", username)
+
+	if username == "" || password == "" || apiKey == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Missing parameters.",
+		})
+		return
+	}
 
 	if apiKey != API_KEY {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -80,7 +96,7 @@ func postLoginMoodle(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "authorized",
+		"allow_login": true,
 	})
 
 }

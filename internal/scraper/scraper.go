@@ -1,7 +1,7 @@
 package scraper
 
 import (
-	"log"
+	"log/slog"
 	"strings"
 
 	"github.com/gocolly/colly/v2"
@@ -29,39 +29,38 @@ func ScrapeLogin(url, username, password string) (valid bool, err error) {
 	})
 
 	c.OnError(func(r *colly.Response, e error) {
-		log.Println("Request error:", e)
+		slog.Error("Request error:", e)
 		err = e
+		return
 	})
 
 	err = c.Visit(url)
 
 	if err != nil {
-		log.Println("Error visiting URL:", err)
+
+		slog.Error("Error visiting URL:", err)
 	}
 
 	c.OnResponse(func(r *colly.Response) {
 		body := string(r.Body)
-		log.Println("Error submitting form:", err)
-		log.Println("Response received:", r.StatusCode)
 
 		hasAccessedString := strings.Contains(body, "Você acessou como")
 
 		responseURL := r.Request.URL
-		log.Println("hasAccessedString:", hasAccessedString)
 		if hasAccessedString && responseURL.Path == "/my/" {
 			valid = true
 		}
 	})
 
 	c.OnError(func(r *colly.Response, e error) {
-		log.Println("Request error:", e)
+		slog.Error("Request error:", e)
 		err = e
 	})
 
 	err = c.Post(actionURL, formData)
 
 	if err != nil {
-		log.Println("Error submitting form:", err)
+		slog.Error("Error submitting form:", err)
 	}
 
 	return
