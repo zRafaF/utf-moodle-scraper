@@ -1,8 +1,11 @@
 # Stage 1: Build Stage
-FROM golang:1.22 AS build
+FROM golang:1.22.0-alpine3.19 AS build
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
+
+# Add make to the container
+RUN apk add make
 
 # Copy go mod and sum files
 COPY go.mod go.sum ./
@@ -17,7 +20,7 @@ COPY . ./
 RUN make build
 
 # Stage 2: Final Stage
-FROM scratch
+FROM alpine:3.19
 
 # Copy the binary from the Build Stage into the Final Stage
 COPY --from=build /app/utf-moodle-scraper /utf-moodle-scraper
