@@ -11,6 +11,12 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type AuthRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	ApiKey   string `json:"api_key" binding:"required"`
+}
+
 var API_KEY string
 
 func getApiKey() string {
@@ -62,13 +68,26 @@ func getAuth(c *gin.Context) {
 }
 
 func postAuth(c *gin.Context) {
-	username := c.PostForm("username")
-	password := c.PostForm("password")
-	apiKey := c.PostForm("api_key")
+	var authRequest AuthRequest
+	err := c.BindJSON(&authRequest)
+
+	if err != nil {
+		slog.Error("Invalid JSON.", "error", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid JSON.",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	username := authRequest.Username
+	password := authRequest.Password
+	apiKey := authRequest.ApiKey
 
 	slog.Info("Received login request", "user", username)
 
 	if username == "" || password == "" || apiKey == "" {
+		slog.Warn("Missing parameters.")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Missing parameters.",
 		})
@@ -76,6 +95,7 @@ func postAuth(c *gin.Context) {
 	}
 
 	if apiKey != API_KEY {
+		slog.Warn("Invalid API key.")
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid API key.",
 		})
@@ -85,6 +105,7 @@ func postAuth(c *gin.Context) {
 	valid, err := scraper.ScrapeLogin("https://moodle.utfpr.edu.br/login/index.php", username, password)
 
 	if err != nil {
+		slog.Error("Error scraping login.", "error", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -92,11 +113,13 @@ func postAuth(c *gin.Context) {
 	}
 
 	if !valid {
+		slog.Warn("Invalid credentials.")
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid credentials.",
 		})
 		return
 	}
+	slog.Info("Login successful.", "user", username)
 	c.JSON(http.StatusOK, gin.H{
 		"allow_login": true,
 	})
