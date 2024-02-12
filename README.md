@@ -7,3 +7,29 @@ This is a simple login forwarder for different applications by web scraping the 
 
 > [!WARNING]  
 > You may not use this software without **EXPLICIT PERMISSION FROM ALL THE PARTS INVOLVED**.
+
+## Routes
+
+### GET `/`
+
+Returns a string with "hello world"
+
+### POST `/auth`
+
+Auth path requires
+
+```json
+{
+	"username": "abcdef",
+	"password": "123123",
+	"api_key": "a1b2c3"
+}
+```
+
+If succeeded responds
+
+```json
+{
+	"allow_login": true
+}
+```

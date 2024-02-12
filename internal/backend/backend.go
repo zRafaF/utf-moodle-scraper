@@ -41,11 +41,12 @@ func Run(debug bool) {
 	}
 	var engine = gin.Default()
 
-	engine.GET("/ping", getPing)
+	engine.GET("/", getRoot)
+	engine.GET("/auth", getAuth)
 	engine.POST("/auth", postAuth)
-	engine.Run(":30412")
+	engine.Run(":8080")
 
-	slog.Info("Service started on port 30412")
+	slog.Info("Service started on port 8080")
 }
 
 func getRoot(c *gin.Context) {
@@ -53,9 +54,10 @@ func getRoot(c *gin.Context) {
 	slog.Info("Received request to root.")
 }
 
-func getPing(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "pong",
+func getAuth(c *gin.Context) {
+	c.JSON(http.StatusMethodNotAllowed, gin.H{
+		"error":   "Method not allowed.",
+		"message": "Use POST method to authenticate. Must contain 'username', 'password' and 'api_key' parameters.",
 	})
 }
 
