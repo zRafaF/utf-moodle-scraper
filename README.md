@@ -33,3 +33,20 @@ If succeeded responds
 	"allow_login": true
 }
 ```
+
+## Using docker
+
+### Building a docker image
+
+```sh
+docker build -t utf-moodle-scraper .
+```
+
+### Running docker image
+
+```sh
+docker run -p 8080:8080 -e API_KEY=yourapikey utf-moodle-scraper
+
+```
+
+> Pay attention to the `-e` flag, it sets the `API_KEY` environment variable, without it the service will not start

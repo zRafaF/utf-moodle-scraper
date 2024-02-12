@@ -44,9 +44,9 @@ func Run(debug bool) {
 	engine.GET("/", getRoot)
 	engine.GET("/auth", getAuth)
 	engine.POST("/auth", postAuth)
-	engine.Run(":8080")
-
 	slog.Info("Service started on port 8080")
+
+	engine.Run(":8080")
 }
 
 func getRoot(c *gin.Context) {
