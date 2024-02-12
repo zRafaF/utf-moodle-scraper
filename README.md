@@ -36,6 +36,8 @@ If succeeded responds
 
 ## Using docker
 
+This app's docker image is available at [zrafaf/utf-moodle-scraper](https://hub.docker.com/r/zrafaf/utf-moodle-scraper)
+
 ### Building a docker image
 
 ```sh
