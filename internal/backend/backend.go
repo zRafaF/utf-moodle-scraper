@@ -16,13 +16,13 @@ var API_KEY string
 func getApiKey() string {
 	slog.Info("Loading API_KEY from .env file...")
 	err := godotenv.Load()
-	if err != nil {
-		panic(err)
-	}
 	envApiKey := os.Getenv("API_KEY")
+	if err != nil {
+		slog.Warn("Error loading .env file", "error", err)
+	}
 
 	if envApiKey == "" {
-		panic("API_KEY not found in .env file")
+		panic("API_KEY not found")
 	}
 
 	slog.Info("API_KEY loaded successfully.")
