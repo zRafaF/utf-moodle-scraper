@@ -74,7 +74,8 @@ func postAuth(c *gin.Context) {
 	if err != nil {
 		slog.Error("Invalid JSON.", "error", err)
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid JSON.",
+			"error":   "Invalid JSON.",
+			"message": err.Error(),
 		})
 		return
 	}
