@@ -25,6 +25,8 @@ func getApiKey() string {
 	envApiKey := os.Getenv("API_KEY")
 	if err != nil {
 		slog.Warn("Error loading .env file", "error", err)
+
+		slog.Info("You can try to set the API_KEY environment variable manually or in a .env file.")
 	}
 
 	if envApiKey == "" {
