@@ -23,7 +23,7 @@ jobs:
             - name: Add tags to image
               run: |
                   docker tag utf-moodle-scraper zrafaf/utf-moodle-scraper:${{ github.event.pull_request.title }}
-                  docker tag utf-moodle-scraper zrafaf/utf-moodle-scraper
+                  docker tag utf-moodle-scraper zrafaf/utf-moodle-scraper:latest
             - name: Push Docker image
               run: |
                   docker push zrafaf/utf-moodle-scraper:${{ github.event.pull_request.title }}
