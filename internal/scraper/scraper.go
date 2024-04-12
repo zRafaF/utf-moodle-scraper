@@ -31,7 +31,6 @@ func ScrapeLogin(url, username, password string) (valid bool, err error) {
 	c.OnError(func(r *colly.Response, e error) {
 		slog.Error("Request error:", e)
 		err = e
-		return
 	})
 
 	err = c.Visit(url)
@@ -42,12 +41,10 @@ func ScrapeLogin(url, username, password string) (valid bool, err error) {
 	}
 
 	c.OnResponse(func(r *colly.Response) {
-		body := string(r.Body)
-
-		hasAccessedString := strings.Contains(body, "Você acessou como")
-
 		responseURL := r.Request.URL
-		if hasAccessedString && responseURL.Path == "/my/" {
+		slog.Info("Response received from", "body:", string(responseURL.Path))
+		slog.Info("BOOL", "B:", responseURL.Path)
+		if strings.Contains(responseURL.Path, "/my/") {
 			valid = true
 		}
 	})

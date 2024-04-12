@@ -10,6 +10,8 @@ This is a simple login forwarder for different applications by web scraping the 
 
 ## Routes
 
+> You can find it at <https://educautf.td.utfpr.edu.br/umc-api/>
+
 ### GET `/`
 
 Returns a string with "hello world"
